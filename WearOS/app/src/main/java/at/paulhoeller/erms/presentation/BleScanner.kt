@@ -1,24 +1,29 @@
 package at.paulhoeller.erms.presentation
 
-import android.Manifest
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanSettings
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Handler
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
-import androidx.core.app.ActivityCompat.requestPermissions
-import androidx.core.content.ContextCompat
 
 // val bleScanner: BleScanner = BleScanner(LocalContext.current as ComponentActivity, Handler());
 //bleScanner.scanLeDevice();
+
 class BleScanner(private val activity: ComponentActivity, private val handler: Handler) {
-    private val REQUEST_BLUETOOTH_PERMISSION = 1
+    private val scanSettings: ScanSettings by lazy {
+        val builder = ScanSettings.Builder()
+
+        builder.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+
+        builder.build()
+    }
+
     private val bluetoothAdapter: BluetoothAdapter? by lazy {
         val bluetoothManager = activity.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothManager.adapter
@@ -29,48 +34,18 @@ class BleScanner(private val activity: ComponentActivity, private val handler: H
     // Stops scanning after 10 seconds.
     private val SCAN_PERIOD: Long = 10000
 
+    @SuppressLint("MissingPermission")
     @RequiresApi(Build.VERSION_CODES.S)
     fun scanLeDevice() {
         if (!scanning) { // Stops scanning after a pre-defined scan period.
             println("Start Scanning...")
             handler.postDelayed({
                 scanning = false
-                if (ActivityCompat.checkSelfPermission(
-                        activity,
-                        Manifest.permission.BLUETOOTH_SCAN
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    println("Permission not granted")
-                    requestPermissions(
-                        activity,
-                        arrayOf(
-                            Manifest.permission.BLUETOOTH_SCAN
-                        ),
-                        REQUEST_BLUETOOTH_PERMISSION
-                    )
-                    println("Permission request done")
-                    return@postDelayed
-                }
+                println("Stopped scanning.")
                 bluetoothLeScanner?.stopScan(leScanCallback)
             }, SCAN_PERIOD)
             scanning = true
-            if (ActivityCompat.checkSelfPermission(
-                    activity,
-                    Manifest.permission.BLUETOOTH_SCAN
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                println("Permission not granted")
-                requestPermissions(
-                    activity,
-                    arrayOf(
-                        Manifest.permission.BLUETOOTH_SCAN
-                    ),
-                    REQUEST_BLUETOOTH_PERMISSION
-                )
-                println("Permission request done")
-                return
-            }
-            bluetoothLeScanner?.startScan(leScanCallback)
+            bluetoothLeScanner?.startScan(null, scanSettings,leScanCallback)
         } else {
             scanning = false
             println("Stopped scanning.")
@@ -80,9 +55,14 @@ class BleScanner(private val activity: ComponentActivity, private val handler: H
     // Device scan callback.
     private val leScanCallback: ScanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
-            println("Got result: ")
+            //println("Got result: ")
             super.onScanResult(callbackType, result)
-            println(result.device);
+            //if(result.scanRecord?.deviceName != null && result.scanRecord?.deviceName != "foobar")
+               // println(result.scanRecord?. + ";"+result.rssi + ";" + result.scanRecord?.txPowerLevel)
+            println(result.toString());
+            //result.txPower
+            //if(result.device)
+           // println(result.rssi)
             /*leDeviceListAdapter.addDevice(result.device)
             leDeviceListAdapter.notifyDataSetChanged()*/
         }

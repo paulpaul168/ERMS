@@ -6,11 +6,17 @@
 
 package at.paulhoeller.erms.presentation
 
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.view.MotionEvent
+import android.view.Surface
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -27,22 +33,17 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import at.paulhoeller.erms.presentation.theme.ERMSTheme
-import com.github.kittinunf.fuel.core.extensions.jsonBody
-import com.github.kittinunf.fuel.httpPost
-import com.google.gson.Gson
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.io.OutputStream
-import java.net.HttpURLConnection
-import java.net.URL
+import android.Manifest
 
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -53,8 +54,10 @@ class MainActivity : ComponentActivity() {
 
 
 
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun WearApp() {
+    val bleScanner = BleScanner(LocalContext.current as ComponentActivity, Handler());
     ERMSTheme {
         val buttonList = listOf(
             "Gefahr für sich selbst",
@@ -83,12 +86,8 @@ fun WearApp() {
                                             BeaconData("3", 1.2)
                                         )
                                     )
-
-                                   /* val (_, _, result) = "https://en3gu2b6yxhqr.x.pipedream.net".httpPost()
-                                        .jsonBody(Gson().toJson(messageData).toString())
-                                        .responseString()
-                                    println(result)*/
-                                    HttpPostTask("https://en3gu2b6yxhqr.x.pipedream.net", messageData).execute()
+                                    bleScanner.scanLeDevice();
+                                    HttpPostTask("https://erms.stefhol.eu/api/v1/events", messageData).execute()
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     backgroundColor = MaterialTheme.colors.primary,

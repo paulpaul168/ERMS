@@ -4,14 +4,15 @@ import com.google.gson.Gson
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
+import javax.net.ssl.HttpsURLConnection
 
 class HttpPostTask(private val url: String, private val messageData: Any) : AsyncTask<Unit, Unit, String>() {
 
     override fun doInBackground(vararg params: Unit?): String {
         val url = URL(url)
         val jsonPayload = Gson().toJson(messageData).toString()
-
-        with(url.openConnection() as HttpURLConnection) {
+        println(jsonPayload)
+        with(url.openConnection() as HttpsURLConnection) {
             requestMethod = "POST"
             doOutput = true
             setRequestProperty("Content-Type", "application/json; utf-8")
