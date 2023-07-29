@@ -11,6 +11,8 @@ do
   mv "$file" "app.jar"
 done
 cd ../..
+# Better Performance
+ssh $SERVER "cd app/hack; docker-compose down"
 ssh $SERVER "rm -rf app/hack/source/*"
 scp -r deploy/* $SERVER:/root/app/hack/source/
 ssh $SERVER "chmod +x app/hack/source/libs/app.jar"

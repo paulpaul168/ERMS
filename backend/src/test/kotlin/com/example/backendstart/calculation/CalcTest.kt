@@ -12,7 +12,7 @@ class CalcTest {
 
     @Test
     fun findSolution() {
-        val calc = Calc()
+        val locationCalc = LocationCalc()
         // storing coefficients of linear
         // equations in coeff matrix
         val coeff = arrayOf(
@@ -20,6 +20,6 @@ class CalcTest {
             doubleArrayOf(1.0, 1.0, 1.0, 6.0),
             doubleArrayOf(1.0, -1.0, 1.0, 2.0)
         )
-        val result = calc.findSolution(coeff)
+        val result = locationCalc.findSolution(coeff)
     }
 }
