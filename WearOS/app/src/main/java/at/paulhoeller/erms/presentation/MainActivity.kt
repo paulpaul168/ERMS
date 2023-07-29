@@ -12,18 +12,23 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.wear.compose.material.Button
+import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import at.paulhoeller.erms.presentation.theme.ERMSTheme
@@ -37,40 +42,44 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
+
 @Composable
 fun WearApp() {
     ERMSTheme {
-        var showMessage by remember { mutableStateOf(false) }
-        var message by remember { mutableStateOf("") }
+        val buttonList = listOf(
+            "Gefahr für sich selbst",
+            "Reanimation",
+            "Gefahr für andere",
+            "Sessel anfragen",
+            "Trage anfragen",
+            "Status: Bereit"
+        )
 
         Surface(color = MaterialTheme.colors.background) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Center Text", style = TextStyle(fontSize = 24.sp))
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    contentPadding = PaddingValues(vertical = 60.dp)
+                ) {
+                    itemsIndexed(buttonList) { index, buttonText ->
 
-                SwipeGestureDetection(
-                    onSwipeRight = {
-                        message = "Right swipe"
-                        showMessage = true
-                    },
-                    onSwipeUp = {
-                        message = "Up swipe"
-                        showMessage = true
-                    },
-                    onSwipeDown = {
-                        message = "Down swipe"
-                        showMessage = true
-                    }
-                )
+                            Button(
+                                onClick = {
 
-                if (showMessage) {
-                    ShowToast(message = message) {
-                        showMessage = false
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = MaterialTheme.colors.primary,
+                                    contentColor = Color.White
+                                ),
+                                modifier = Modifier.fillMaxWidth().padding(8.dp)
+                            ) {
+                                Text(buttonText, style = TextStyle(fontSize = 16.sp))
+                            }
+
+
                     }
                 }
-            }
         }
     }
 }
@@ -96,6 +105,7 @@ fun SwipeGestureDetection(
                         startY = event.y
                         true
                     }
+
                     MotionEvent.ACTION_UP -> {
                         val deltaX = event.x - startX
                         val deltaY = event.y - startY
@@ -106,6 +116,7 @@ fun SwipeGestureDetection(
                         }
                         true
                     }
+
                     else -> false
                 }
             }
