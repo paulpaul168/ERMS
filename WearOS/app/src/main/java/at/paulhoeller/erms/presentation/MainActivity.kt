@@ -76,7 +76,7 @@ fun WearApp() {
                     onSwipeRight = {},
                     onSwipeUp = {
                         println("up")
-                        selected = (selected - 1).coerceAtLeast(0);
+                        selected = (selected - 1).coerceAtLeast(-1);
                     },
                     onSwipeDown = {
                         println("down")
@@ -84,37 +84,57 @@ fun WearApp() {
                     }
                 )
 
-                Column {
+                if (selected == -1) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(Color.Black)
-                            .fillMaxHeight(0.65F),
+                            .fillMaxHeight(),
                         contentAlignment = Alignment.Center
                     ) {
+                        // IDK, cannot think right now, maybe we can use the native Textclock, or we
+                        // fake it.
                         Text(
-                            text = actions[selected].emoji,
+                            text = "Clock or so",
                             color = Color.White,
-                            fontSize = 56.sp,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .background(Color.White),
-                        contentAlignment = Alignment.TopCenter
-                    ) {
-                        Text(
-                            text = actions[selected].name,
-                            color = Color.Black,
                             fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(16.dp)
                         )
                     }
+                } else {
 
+                    Column {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.Black)
+                                .fillMaxHeight(0.65F),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = actions[selected].emoji,
+                                color = Color.White,
+                                fontSize = 56.sp,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                                .background(Color.White),
+                            contentAlignment = Alignment.TopCenter
+                        ) {
+                            Text(
+                                text = actions[selected].name,
+                                color = Color.Black,
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+
+                    }
                 }
             }
         }
