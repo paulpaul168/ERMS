@@ -1,14 +1,22 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+//import { useState } from "react";
+import "./App.css";
+import MessageCard from "./MessageCard";
 
 function App() {
-  const [count, setCount] = useState(0)
-
-   return <h1 className="text-3xl bg-red-500 font-bold underline">
-      Hello world!
-   </h1>
+  return (
+    <>
+      <div className="w-full p-4">
+        <div className="max-w-lg mx-auto">
+          <h1 className="text-3xl font-bold">Messages</h1>
+        </div>
+      </div>
+      <main className="w-full max-w-lg mx-auto">
+        <MessageCard />
+        <MessageCard />
+        <MessageCard />
+      </main>
+    </>
+  );
 }
 
-export default App
+export default App;
