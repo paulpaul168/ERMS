@@ -32,6 +32,9 @@ import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import at.paulhoeller.erms.presentation.theme.ERMSTheme
+import com.github.kittinunf.fuel.core.extensions.jsonBody
+import com.github.kittinunf.fuel.httpPost
+import com.google.gson.Gson
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,10 +66,22 @@ fun WearApp() {
                     contentPadding = PaddingValues(vertical = 60.dp)
                 ) {
                     itemsIndexed(buttonList) { index, buttonText ->
-
                             Button(
                                 onClick = {
+                                    val messageData = MessageData(
+                                        "1234343",
+                                        buttonList[index],
+                                        listOf<BeaconData>(
+                                            BeaconData("1", 0.3),
+                                            BeaconData("2", 0.2),
+                                            BeaconData("3", 1.2)
+                                        )
+                                    )
 
+                                    val (_, _, result) = "https://en3gu2b6yxhqr.x.pipedream.net".httpPost()
+                                        .jsonBody(Gson().toJson(messageData).toString())
+                                        .responseString()
+                                    println(result)
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     backgroundColor = MaterialTheme.colors.primary,
