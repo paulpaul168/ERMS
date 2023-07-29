@@ -12,21 +12,29 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.wear.compose.material.Button
+import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import at.paulhoeller.erms.presentation.theme.ERMSTheme
+import com.github.kittinunf.fuel.core.extensions.jsonBody
+import com.github.kittinunf.fuel.httpPost
+import com.google.gson.Gson
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,40 +45,56 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
+
 @Composable
 fun WearApp() {
     ERMSTheme {
-        var showMessage by remember { mutableStateOf(false) }
-        var message by remember { mutableStateOf("") }
+        val buttonList = listOf(
+            "Gefahr für sich selbst",
+            "Reanimation",
+            "Gefahr für andere",
+            "Sessel anfragen",
+            "Trage anfragen",
+            "Status: Bereit"
+        )
 
         Surface(color = MaterialTheme.colors.background) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Center Text", style = TextStyle(fontSize = 24.sp))
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    contentPadding = PaddingValues(vertical = 60.dp)
+                ) {
+                    itemsIndexed(buttonList) { index, buttonText ->
+                            Button(
+                                onClick = {
+                                    val messageData = MessageData(
+                                        "1234343",
+                                        buttonList[index],
+                                        listOf<BeaconData>(
+                                            BeaconData("1", 0.3),
+                                            BeaconData("2", 0.2),
+                                            BeaconData("3", 1.2)
+                                        )
+                                    )
 
-                SwipeGestureDetection(
-                    onSwipeRight = {
-                        message = "Right button pressed"
-                        showMessage = true
-                    },
-                    onSwipeUp = {
-                        message = "Up button pressed"
-                        showMessage = true
-                    },
-                    onSwipeDown = {
-                        message = "Down button pressed"
-                        showMessage = true
-                    }
-                )
+                                    val (_, _, result) = "https://en3gu2b6yxhqr.x.pipedream.net".httpPost()
+                                        .jsonBody(Gson().toJson(messageData).toString())
+                                        .responseString()
+                                    println(result)
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = MaterialTheme.colors.primary,
+                                    contentColor = Color.White
+                                ),
+                                modifier = Modifier.fillMaxWidth().padding(8.dp)
+                            ) {
+                                Text(buttonText, style = TextStyle(fontSize = 16.sp))
+                            }
 
-                if (showMessage) {
-                    ShowToast(message = message) {
-                        showMessage = false
+
                     }
                 }
-            }
         }
     }
 }
@@ -83,8 +107,7 @@ fun SwipeGestureDetection(
     onSwipeUp: () -> Unit,
     onSwipeDown: () -> Unit
 ) {
-    val context = LocalContext.current
-
+    var startX by remember { mutableStateOf(0f) }
     var startY by remember { mutableStateOf(0f) }
 
     Box(
@@ -93,18 +116,22 @@ fun SwipeGestureDetection(
             .pointerInteropFilter { event ->
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
+                        startX = event.x
                         startY = event.y
                         true
                     }
+
                     MotionEvent.ACTION_UP -> {
+                        val deltaX = event.x - startX
                         val deltaY = event.y - startY
                         when {
-                            deltaY < -50 -> onSwipeUp()
-                            deltaY > 50 -> onSwipeDown()
-                            else -> onSwipeRight()
+                            deltaY < -50 -> onSwipeDown()
+                            deltaY > 50 -> onSwipeUp()
+                            deltaX < -50 -> onSwipeRight()
                         }
                         true
                     }
+
                     else -> false
                 }
             }

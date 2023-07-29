@@ -1,5 +1,7 @@
 server:
   port: 80
+  servlet:
+    context-path: /api/v1
 
 spring:
   datasource:
@@ -12,3 +14,4 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   flyway:
     enabled: true
+
