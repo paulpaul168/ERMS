@@ -35,6 +35,12 @@ import at.paulhoeller.erms.presentation.theme.ERMSTheme
 import com.github.kittinunf.fuel.core.extensions.jsonBody
 import com.github.kittinunf.fuel.httpPost
 import com.google.gson.Gson
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.io.OutputStream
+import java.net.HttpURLConnection
+import java.net.URL
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,10 +84,11 @@ fun WearApp() {
                                         )
                                     )
 
-                                    val (_, _, result) = "https://en3gu2b6yxhqr.x.pipedream.net".httpPost()
+                                   /* val (_, _, result) = "https://en3gu2b6yxhqr.x.pipedream.net".httpPost()
                                         .jsonBody(Gson().toJson(messageData).toString())
                                         .responseString()
-                                    println(result)
+                                    println(result)*/
+                                    HttpPostTask("https://en3gu2b6yxhqr.x.pipedream.net", messageData).execute()
                                 },
                                 colors = ButtonDefaults.buttonColors(
                                     backgroundColor = MaterialTheme.colors.primary,
