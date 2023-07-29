@@ -61,43 +61,61 @@ fun WearApp() {
             Action("Bereit", "🧽"),
         )
 
-        val selected = 2;
+        var selected by remember { mutableStateOf(0) };
+        println("hey now");
 
         Surface(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            Column {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.Black)
-                        .fillMaxHeight(0.65F),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = actions[selected].emoji,
-                        color = Color.White,
-                        fontSize = 56.sp,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                        .background(Color.White),
-                    contentAlignment = Alignment.TopCenter
-                ) {
-                    Text(
-                        text = actions[selected].name,
-                        color = Color.Black,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                SwipeGestureDetection(
+                    onSwipeRight = {},
+                    onSwipeUp = {
+                        println("up")
+                        selected = (selected - 1).coerceAtLeast(0);
+                    },
+                    onSwipeDown = {
+                        println("down")
+                        selected = (selected + 1).coerceAtMost(actions.count() - 1);
+                    }
+                )
 
+                Column {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.Black)
+                            .fillMaxHeight(0.65F),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = actions[selected].emoji,
+                            color = Color.White,
+                            fontSize = 56.sp,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                            .background(Color.White),
+                        contentAlignment = Alignment.TopCenter
+                    ) {
+                        Text(
+                            text = actions[selected].name,
+                            color = Color.Black,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+
+                }
             }
         }
     }
