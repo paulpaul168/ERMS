@@ -19,7 +19,7 @@ class BleScanner(private val activity: ComponentActivity, private val handler: H
     private val scanSettings: ScanSettings by lazy {
         val builder = ScanSettings.Builder()
 
-        builder.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+        builder.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).setReportDelay(0)
 
         builder.build()
     }
@@ -32,7 +32,7 @@ class BleScanner(private val activity: ComponentActivity, private val handler: H
     private var scanning = false
 
     // Stops scanning after 10 seconds.
-    private val SCAN_PERIOD: Long = 10000
+    private val SCAN_PERIOD: Long = 20000
 
     @SuppressLint("MissingPermission")
     @RequiresApi(Build.VERSION_CODES.S)
