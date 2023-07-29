@@ -52,15 +52,15 @@ fun WearApp() {
 
                 SwipeGestureDetection(
                     onSwipeRight = {
-                        message = "Right button pressed"
+                        message = "Right swipe"
                         showMessage = true
                     },
                     onSwipeUp = {
-                        message = "Up button pressed"
+                        message = "Up swipe"
                         showMessage = true
                     },
                     onSwipeDown = {
-                        message = "Down button pressed"
+                        message = "Down swipe"
                         showMessage = true
                     }
                 )
@@ -83,8 +83,7 @@ fun SwipeGestureDetection(
     onSwipeUp: () -> Unit,
     onSwipeDown: () -> Unit
 ) {
-    val context = LocalContext.current
-
+    var startX by remember { mutableStateOf(0f) }
     var startY by remember { mutableStateOf(0f) }
 
     Box(
@@ -93,15 +92,17 @@ fun SwipeGestureDetection(
             .pointerInteropFilter { event ->
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
+                        startX = event.x
                         startY = event.y
                         true
                     }
                     MotionEvent.ACTION_UP -> {
+                        val deltaX = event.x - startX
                         val deltaY = event.y - startY
                         when {
-                            deltaY < -50 -> onSwipeUp()
-                            deltaY > 50 -> onSwipeDown()
-                            else -> onSwipeRight()
+                            deltaY < -50 -> onSwipeDown()
+                            deltaY > 50 -> onSwipeUp()
+                            deltaX < -50 -> onSwipeRight()
                         }
                         true
                     }
