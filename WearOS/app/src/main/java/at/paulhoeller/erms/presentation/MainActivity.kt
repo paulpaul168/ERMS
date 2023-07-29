@@ -103,6 +103,8 @@ fun WearApp() {
                     }
                 } else {
 
+                    // FIXME: on tap (or maybe double tap to avoid random touches) we should
+                    // send the Post request that is already in the git history.
                     Column {
                         Box(
                             modifier = Modifier
