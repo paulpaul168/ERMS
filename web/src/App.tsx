@@ -6,6 +6,8 @@ import { MapFC } from "./components/Map";
 import MessageCard from "./ui-util/MessageCard";
 import Slide from '@mui/material/Slide';
 import React from "react";
+import Logo from './assets/logo.svg';
+import Profile from './assets/profile.svg';
 
 function arraysHaveSameElements(array1: string[], array2: string[]) {
   // Check if both arrays have the same length
@@ -72,7 +74,11 @@ function App() {
 
   return (
     <>
-
+    {/* <nav className="bg-white border-gray-200 dark:bg-gray-300 flex">
+      <img src={Logo} className="max-h-16"></img>
+      <div className="grow"></div>
+      <img src={Profile} className="max-h-16 p-2"></img>
+    </nav> */}
       <div className="grid grid-cols-3 gap-8 m-4 mx-28">
         <h1 className="text-3xl font-bold col-span-3">Emergencies</h1>
         <article className="col-span-2">
