@@ -21,7 +21,7 @@ Welcome to ERMS (Emergency Responder Messaging System) - the ultimate solution f
 
 ## Installation
 
-At this stage, ERMS is still under heavy development but in the future you will just be able to use the Google Play Store to install the app. Simply search for it and hit the install button.
+At this stage, ERMS is still under heavy development but in the future, you will just be able to use the Google Play Store to install the app. Simply search for it and hit the install button.
 
 ## Usage
 
@@ -42,7 +42,7 @@ We value and welcome contributions from the community to make ERMS even better. 
 4. Push the changes to your branch: `git push origin feature/your-feature`
 5. Submit a pull request to the `main` branch.
 
-Please ensure your code follows our [code style guidelines](https://github.com/yourusername/ERMS/blob/main/CODE_STYLE.md).
+Please ensure your code follows the appropriate style guide. For Kotlin, we use [kotlin style guide](https://developer.android.com/kotlin/style-guide) and for typescript please make sure that it follows the [typescript style guide](https://google.github.io/styleguide/tsguide.html)
 
 ## License
 
@@ -54,4 +54,4 @@ We extend our gratitude to all the Red Cross team members and Coding Austria men
 
 ## Contact
 
-If you have any questions, suggestions, or need support, feel free to contact us directly through Github.
+If you have any questions, suggestions, or need support, feel free to contact us directly through GitHub.
