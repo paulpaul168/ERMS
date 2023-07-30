@@ -25,13 +25,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.wear.compose.material.Text
 import at.paulhoeller.erms.presentation.theme.ERMSTheme
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.unit.TextUnit
+import androidx.wear.compose.material.MaterialTheme
+import kotlinx.coroutines.delay
 
 
 class MainActivity : ComponentActivity() {
@@ -46,11 +65,23 @@ class MainActivity : ComponentActivity() {
 
 data class Action(val name: String, val emoji: String);
 
-
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun WearApp() {
     val bleScanner = BleScanner(LocalContext.current as ComponentActivity, Handler());
+    var currentTime by remember { mutableStateOf(System.currentTimeMillis()) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            currentTime = System.currentTimeMillis()
+            delay(1000)
+        }
+    }
+
+    val formattedTime = remember(currentTime) {
+        SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(currentTime)
+    }
+
     ERMSTheme {
         val actions = listOf(
             Action("Bedrohung", "👊"),
@@ -61,8 +92,7 @@ fun WearApp() {
             Action("Bereit", "🧽"),
         )
 
-        var selected by remember { mutableStateOf(0) };
-        println("hey now");
+        var selected by remember { mutableStateOf(-1) };
 
         Surface(
             modifier = Modifier
@@ -92,10 +122,8 @@ fun WearApp() {
                             .fillMaxHeight(),
                         contentAlignment = Alignment.Center
                     ) {
-                        // IDK, cannot think right now, maybe we can use the native Textclock, or we
-                        // fake it.
                         Text(
-                            text = "Clock or so",
+                            text = formattedTime,
                             color = Color.White,
                             fontSize = 24.sp,
                             modifier = Modifier.padding(16.dp)
