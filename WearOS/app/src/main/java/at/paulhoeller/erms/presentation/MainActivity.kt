@@ -26,18 +26,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material.Text
 import at.paulhoeller.erms.presentation.theme.ERMSTheme
-import java.text.SimpleDateFormat
-import java.util.Locale
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import kotlinx.coroutines.delay
 import java.lang.Math.abs
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 class MainActivity : ComponentActivity() {
@@ -71,12 +63,12 @@ fun WearApp() {
 
     ERMSTheme {
         val actions = listOf(
-            Action("Bedrohung", "👊"),
-            Action("Reanimation", "🩺"),
+            Action("Danger", "👊"),
+            Action("CPR", "🩺"),
             Action("Security", "👮‍♂️"),
-            Action("Sessel", "🪑"),
-            Action("Trage", "🛏️"),
-            Action("Bereit", "🧽"),
+            Action("Chair", "🪑"),
+            Action("Stretcher", "🛏️"),
+            Action("Ready", "✅"),
         )
 
         var selected by remember { mutableStateOf(-1) };
@@ -134,7 +126,7 @@ fun WearApp() {
                                 .fillMaxWidth()
                                 .background(Color.Black)
                                 .fillMaxHeight(0.65F),
-                           contentAlignment = Alignment.Center,
+                            contentAlignment = Alignment.Center,
                         ) {
                             Text(
                                 text = actions[selected].emoji,
