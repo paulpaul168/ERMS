@@ -72,7 +72,8 @@ function App() {
 
   return (
     <>
-      <div className="grid grid-cols-3 gap-4 m-4 mx-28">
+
+      <div className="grid grid-cols-3 gap-8 m-4 mx-28">
         <h1 className="text-3xl font-bold col-span-3">Emergencies</h1>
         <article className="col-span-2">
           <MapFC eventLocations={eventLocations} update={update} messages={messages} />
