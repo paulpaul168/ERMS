@@ -7,9 +7,11 @@ import jakarta.persistence.*
     name = "beacon"
 )
 class Beacon(
-    x: Float,
-    y: Float,
-    z: Float
+    val lat: Double,
+    val long: Double,
+    val x: Double,
+    val y: Double,
+    val z: Double
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

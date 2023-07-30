@@ -1,16 +1,24 @@
 package com.example.backendstart.controller
 
+import com.example.backendstart.calculation.LocationCalc
 import com.example.backendstart.model.Event
+import com.example.backendstart.service.BeaconService
 import com.example.backendstart.service.EventService
+import com.example.backendstart.service.PersonService
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.web.bind.annotation.*
 import java.time.Instant
 import java.util.*
+import kotlin.random.Random
 
 
 @RestController
-class Default(private val eventService: EventService) {
+class Default(
+    private val eventService: EventService,
+    private val personService: PersonService,
+    private val beaconService: BeaconService
+) {
     @GetMapping("/")
     fun index(): String {
         return "Event Service"
@@ -19,15 +27,20 @@ class Default(private val eventService: EventService) {
 
     @PostMapping(value = ["/events"], consumes = ["application/json"], produces = ["application/json"])
     fun createEvent(@RequestBody createEvent: CreateEvent): Event? {
-        val location = calcLocation(createEvent.beacons)
+        val locationCalc = LocationCalc()
+        val beacons = beaconService.list()
+        val location = locationCalc.calc(createEvent.beacons.toTypedArray(), beacons)
+        val persons = personService.list();
+
         val event = Event(
             deviceId = createEvent.deviceId,
-            lat = location.x,
-            long = location.y,
-            height = location.z,
+            x = location.x,
+            y = location.y,
+            z = location.z,
             message = createEvent.message,
             date = Instant.now(),
-            checked = false
+            checked = false,
+            from = persons.getOrNull(Random.nextInt(persons.size))
         )
         return eventService.save(event)
     }
@@ -46,13 +59,13 @@ class Default(private val eventService: EventService) {
     }
 
     @GetMapping("/events")
-    fun allEvents(@RequestParam(required = false, name = "checked") checked: Boolean?): Collection<Event> {
+    fun allEvents(@RequestParam(required = false, name = "checked") checked: String?): Collection<Event> {
 
         val events = eventService.list()
 
         events.filter {
             if (checked != null) {
-                it.checked == checked
+                it.checked == (checked == "true")
             } else {
                 true
             }
@@ -63,7 +76,7 @@ class Default(private val eventService: EventService) {
 }
 
 data class CreateBeacon(
-    val id: UUID,
+    val id: String,
     val RSSI: Double
 )
 
@@ -75,9 +88,5 @@ data class CreateEvent(
 
 class Location(val x: Double, val y: Double, val z: Double);
 
-//TODO: Implement fancy calculation
-fun calcLocation(beacons: Collection<CreateBeacon>): Location {
-    return Location(0.0, 0.0, 0.0)
-}
 
 

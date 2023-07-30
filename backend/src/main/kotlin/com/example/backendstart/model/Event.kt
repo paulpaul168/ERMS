@@ -11,12 +11,14 @@ import java.util.*
 class Event(
     @Column(nullable = false)
     val deviceId: String,
-    val lat: Double,
-    val long: Double,
-    val height: Double,
+    val x: Double,
+    val y: Double,
+    val z: Double,
     val message: String,
     val date: Instant,
-    var checked: Boolean
+    var checked: Boolean,
+    @OneToOne
+    val from: Person?
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

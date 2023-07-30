@@ -2,18 +2,18 @@ package com.example.backendstart.calculation
 
 import com.example.backendstart.controller.CreateBeacon
 import com.example.backendstart.controller.Location
+import com.example.backendstart.model.Beacon
 import org.slf4j.LoggerFactory
 import kotlin.math.pow
 
 
-class Calc {
+class LocationCalc {
 
-    private var logger: org.slf4j.Logger? = LoggerFactory.getLogger(Calc::class.java)
+    private var logger: org.slf4j.Logger? = LoggerFactory.getLogger(LocationCalc::class.java)
 
     // This functions finds the determinant of Matrix
     private fun determinantOfMatrix(mat: Array<DoubleArray>): Double {
-        val ans: Double
-        ans = (mat[0][0] * (mat[1][1] * mat[2][2] - mat[2][1] * mat[1][2])
+        val ans: Double = (mat[0][0] * (mat[1][1] * mat[2][2] - mat[2][1] * mat[1][2])
                 - mat[0][1] * (mat[1][0] * mat[2][2] - mat[1][2] * mat[2][0])
                 + mat[0][2] * (mat[1][0] * mat[2][1] - mat[1][1] * mat[2][0]))
         return ans
@@ -83,7 +83,6 @@ class Calc {
                     "No solutions"
                 )
             }
-            logger?.trace("Return closest Beacon available: Possible Infinite Solutions")
             val smallestDistance = coeff.reduce { acc, doubles ->
                 if (acc[3] > doubles[3]) {
                     doubles
@@ -98,19 +97,40 @@ class Calc {
     /**
      * Calculates out of beacons the nearest location
      */
-    public fun calc(beacons: Array<CreateBeacon>): Location {
-
+    fun calc(beacons: Array<CreateBeacon>, dbBeacons: Collection<Beacon>): Location {
         if (beacons.size < 3) {
             logger?.trace("Not as many beacons supplied")
+            val smallestDistance = beacons.reduce { acc, doubles ->
+                if (acc.RSSI > doubles.RSSI) {
+                    doubles
+                } else {
+                    acc
+                }
+            }
+            val smallestDistanceBeacon = dbBeacons.find { it.id == smallestDistance.id }
+            return smallestDistanceBeacon?.let { Location(it.x, smallestDistanceBeacon.y, smallestDistanceBeacon.z) }
+                ?: return Location(0.0, 0.0, 0.0)
+        } else {
+            data class TempBeacon(val RSSID: Double, val x: Double, val y: Double, val z: Double) {
+                val distance = calculateDistance(RSSID)
+            }
+
+            val tempBeacons = dbBeacons.filter { dbBeacon -> beacons.any { it.id == dbBeacon.id } }.map { dbBeacon ->
+                val beacon = beacons.find { it.id == dbBeacon.id }
+                beacon?.let {
+                    TempBeacon(it.RSSI, dbBeacon.x, dbBeacon.y, dbBeacon.z)
+                }
+            }.filterNotNull()
+
+            val arrayOfBeaconsWithDistance = arrayOfNulls<DoubleArray>(3)
+            repeat(3) {
+                val tempBeacon = tempBeacons[it]
+                // Beacon: x y z dis
+                arrayOfBeaconsWithDistance[it] =
+                    doubleArrayOf(tempBeacon.x, tempBeacon.y, tempBeacon.z, tempBeacon.distance)
+            }
+            return findSolution(arrayOfBeaconsWithDistance.requireNoNulls())
         }
-        val r1 = arrayOfNulls<DoubleArray>(3)
-        // Beacon 1: x y z dis 0 0
-        // Beacon 2: x y z 0 dis 0
-        // Beacon 3: x y z 0 0 dis
-        r1[0] = doubleArrayOf(2.0, 2.0, 1.0, calculateDistance(beacons[1].RSSI))
-        r1[1] = doubleArrayOf(-2.0, 2.0, 1.0, calculateDistance(beacons[2].RSSI))
-        r1[2] = doubleArrayOf(2.0, -2.0, 1.0, calculateDistance(beacons[3].RSSI))
-        return findSolution(r1.requireNoNulls())
     }
 
 
