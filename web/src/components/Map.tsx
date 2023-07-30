@@ -43,6 +43,22 @@ type CellProps = {
   messages: Message[]
 }
 const Cell: React.FC<CellProps> = ({ value, nmbr: location, messages }) => {
+  async function dispatchCallback(id: string) {
+    const res = await fetch("https://erms.stefhol.eu/api/v1/events", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: id,
+        checked: true,
+      }),
+    });
+    // const newMessages = messages.filter((m) => m.id != id);
+    // setMessages(newMessages);
+    // setUpdate((prev) => prev + 1);
+    // setEventLocations(newMessages.map((m) => m.location));
+  }
   return (
     <>
       <Popover>
@@ -53,7 +69,7 @@ const Cell: React.FC<CellProps> = ({ value, nmbr: location, messages }) => {
           <div className="flex flex-col" >
             {value === "x" ?
               messages.filter(m => m.location === location).map(m => (
-                <MessageCard message={m} />
+                <MessageCard message={m} dispatchCallback={dispatchCallback} key={m.id} />
               ))
               :
               <span className="bg-white rounded-xl drop-shadow-md p-3 mb-5">

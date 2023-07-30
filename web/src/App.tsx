@@ -4,8 +4,10 @@ import { useInterval } from "./util";
 import Message from "./Message";
 import { MapFC } from "./components/Map";
 import MessageCard from "./ui-util/MessageCard";
+import Slide from '@mui/material/Slide';
+import React from "react";
 
-function arraysHaveSameElements(array1, array2) {
+function arraysHaveSameElements(array1: string[], array2: string[]) {
   // Check if both arrays have the same length
   if (array1.length !== array2.length) {
     return false;
@@ -52,7 +54,7 @@ function App() {
   }, 1000);
 
   async function dispatchCallback(id: string) {
-    const res = await fetch("https://erms.stefhol.eu/api/v1/events", {
+    const _res = await fetch("https://erms.stefhol.eu/api/v1/events", {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -62,23 +64,23 @@ function App() {
         checked: true,
       }),
     });
-    const newMessages = messages.filter((m) => m.id != id);
-    setMessages(newMessages);
-    setUpdate((prev) => prev + 1);
-    setEventLocations(newMessages.map((m) => m.location));
+    // const newMessages = messages.filter((m) => m.id != id);
+    // setMessages(newMessages);
+    // setUpdate((prev) => prev + 1);
+    // setEventLocations(newMessages.map((m) => m.location));
   }
 
   return (
     <>
-      <div class="grid grid-cols-3 gap-4 m-4 mx-28">
+      <div className="grid grid-cols-3 gap-4 m-4 mx-28">
         <h1 className="text-3xl font-bold col-span-3">Emergencies</h1>
         <article className="col-span-2">
           <MapFC eventLocations={eventLocations} update={update} messages={messages} />
         </article>
         <main className="col-span-1">
-        
+
           {messages.length > 0 ? (
-            messages.map((m) => <MessageCard key={m.id} message={m} dispatchCallback={dispatchCallback}/>)
+            messages.map((m) => <CardWrapper key={m.id} message={m} dispatchCallback={dispatchCallback} />)
           ) : (
             <div className="italic w-full flex justify-center pt-24">
               No open messages 🎉{" "}
@@ -89,5 +91,26 @@ function App() {
     </>
   );
 }
+const CardWrapper: React.FC<{
+  message: Message;
+  dispatchCallback: (id: string) => void;
+}> = React.forwardRef((props, ref) => {
+  const [inc, setInc] = useState(true)
+  function dispatchCallback(id: string) {
+    setInc(false)
+    props.dispatchCallback(id)
+  }
+  return (
+    <Slide in={inc} mountOnEnter direction="left">
+
+      <MessageCard
+        //@ts-ignore
+        ref={ref}
+        message={props.message}
+        dispatchCallback={dispatchCallback}
+      />
+    </Slide>
+  )
+})
 
 export default App;
