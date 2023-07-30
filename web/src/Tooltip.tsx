@@ -6,30 +6,37 @@ import {
   offset,
   flip,
   shift,
-  useHover,
-  useFocus,
+  useClick,
   useDismiss,
   useRole,
   useInteractions,
   useMergeRefs,
-  FloatingPortal
+  Placement,
+  FloatingPortal,
+  FloatingFocusManager,
+  useId
 } from "@floating-ui/react";
-import type { Placement } from "@floating-ui/react";
 
-interface TooltipOptions {
+interface PopoverOptions {
   initialOpen?: boolean;
   placement?: Placement;
+  modal?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
 
-export function useTooltip({
+export function usePopover({
   initialOpen = false,
-  placement = "top",
+  placement = "bottom",
+  modal,
   open: controlledOpen,
   onOpenChange: setControlledOpen
-}: TooltipOptions = {}) {
+}: PopoverOptions = {}) {
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(initialOpen);
+  const [labelId, setLabelId] = React.useState<string | undefined>();
+  const [descriptionId, setDescriptionId] = React.useState<
+    string | undefined
+  >();
 
   const open = controlledOpen ?? uncontrolledOpen;
   const setOpen = setControlledOpen ?? setUncontrolledOpen;
@@ -43,7 +50,7 @@ export function useTooltip({
       offset(5),
       flip({
         crossAxis: placement.includes("-"),
-        fallbackAxisSideDirection: "start",
+        fallbackAxisSideDirection: "end",
         padding: 5
       }),
       shift({ padding: 5 })
@@ -52,62 +59,78 @@ export function useTooltip({
 
   const context = data.context;
 
-  const hover = useHover(context, {
-    move: false,
-    enabled: controlledOpen == null
-  });
-  const focus = useFocus(context, {
+  const click = useClick(context, {
     enabled: controlledOpen == null
   });
   const dismiss = useDismiss(context);
-  const role = useRole(context, { role: "tooltip" });
+  const role = useRole(context);
 
-  const interactions = useInteractions([hover, focus, dismiss, role]);
+  const interactions = useInteractions([click, dismiss, role]);
 
   return React.useMemo(
     () => ({
       open,
       setOpen,
       ...interactions,
-      ...data
+      ...data,
+      modal,
+      labelId,
+      descriptionId,
+      setLabelId,
+      setDescriptionId
     }),
-    [open, setOpen, interactions, data]
+    [open, setOpen, interactions, data, modal, labelId, descriptionId]
   );
 }
 
-type ContextType = ReturnType<typeof useTooltip> | null;
+type ContextType =
+  | (ReturnType<typeof usePopover> & {
+      setLabelId: React.Dispatch<React.SetStateAction<string | undefined>>;
+      setDescriptionId: React.Dispatch<
+        React.SetStateAction<string | undefined>
+      >;
+    })
+  | null;
 
-const TooltipContext = React.createContext<ContextType>(null);
+const PopoverContext = React.createContext<ContextType>(null);
 
-export const useTooltipContext = () => {
-  const context = React.useContext(TooltipContext);
+export const usePopoverContext = () => {
+  const context = React.useContext(PopoverContext);
 
   if (context == null) {
-    throw new Error("Tooltip components must be wrapped in <Tooltip />");
+    throw new Error("Popover components must be wrapped in <Popover />");
   }
 
   return context;
 };
 
-export function Tooltip({
+export function Popover({
   children,
-  ...options
-}: { children: React.ReactNode } & TooltipOptions) {
+  modal = false,
+  ...restOptions
+}: {
+  children: React.ReactNode;
+} & PopoverOptions) {
   // This can accept any props as options, e.g. `placement`,
   // or other positioning options.
-  const tooltip = useTooltip(options);
+  const popover = usePopover({ modal, ...restOptions });
   return (
-    <TooltipContext.Provider value={tooltip}>
+    <PopoverContext.Provider value={popover}>
       {children}
-    </TooltipContext.Provider>
+    </PopoverContext.Provider>
   );
 }
 
-export const TooltipTrigger = React.forwardRef<
+interface PopoverTriggerProps {
+  children: React.ReactNode;
+  asChild?: boolean;
+}
+
+export const PopoverTrigger = React.forwardRef<
   HTMLElement,
-  React.HTMLProps<HTMLElement> & { asChild?: boolean }
->(function TooltipTrigger({ children, asChild = false, ...props }, propRef) {
-  const context = useTooltipContext();
+  React.HTMLProps<HTMLElement> & PopoverTriggerProps
+>(function PopoverTrigger({ children, asChild = false, ...props }, propRef) {
+  const context = usePopoverContext();
   const childrenRef = (children as any).ref;
   const ref = useMergeRefs([context.refs.setReference, propRef, childrenRef]);
 
@@ -127,6 +150,7 @@ export const TooltipTrigger = React.forwardRef<
   return (
     <button
       ref={ref}
+      type="button"
       // The user can style the trigger based on the state
       data-state={context.open ? "open" : "closed"}
       {...context.getReferenceProps(props)}
@@ -136,25 +160,84 @@ export const TooltipTrigger = React.forwardRef<
   );
 });
 
-export const TooltipContent = React.forwardRef<
+export const PopoverContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLProps<HTMLDivElement>
->(function TooltipContent({ style, ...props }, propRef) {
-  const context = useTooltipContext();
+>(function PopoverContent({ style, ...props }, propRef) {
+  const { context: floatingContext, ...context } = usePopoverContext();
   const ref = useMergeRefs([context.refs.setFloating, propRef]);
 
-  if (!context.open) return null;
+  if (!floatingContext.open) return null;
 
   return (
     <FloatingPortal>
-      <div
-        ref={ref}
-        style={{
-          ...context.floatingStyles,
-          ...style
-        }}
-        {...context.getFloatingProps(props)}
-      />
+      <FloatingFocusManager context={floatingContext} modal={context.modal}>
+        <div
+          ref={ref}
+          style={{ ...context.floatingStyles, ...style }}
+          aria-labelledby={context.labelId}
+          aria-describedby={context.descriptionId}
+          {...context.getFloatingProps(props)}
+        >
+          {props.children}
+        </div>
+      </FloatingFocusManager>
     </FloatingPortal>
+  );
+});
+
+export const PopoverHeading = React.forwardRef<
+  HTMLHeadingElement,
+  React.HTMLProps<HTMLHeadingElement>
+>(function PopoverHeading(props, ref) {
+  const { setLabelId } = usePopoverContext();
+  const id = useId();
+
+  // Only sets `aria-labelledby` on the Popover root element
+  // if this component is mounted inside it.
+  React.useLayoutEffect(() => {
+    setLabelId(id);
+    return () => setLabelId(undefined);
+  }, [id, setLabelId]);
+
+  return (
+    <h2 {...props} ref={ref} id={id}>
+      {props.children}
+    </h2>
+  );
+});
+
+export const PopoverDescription = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLProps<HTMLParagraphElement>
+>(function PopoverDescription(props, ref) {
+  const { setDescriptionId } = usePopoverContext();
+  const id = useId();
+
+  // Only sets `aria-describedby` on the Popover root element
+  // if this component is mounted inside it.
+  React.useLayoutEffect(() => {
+    setDescriptionId(id);
+    return () => setDescriptionId(undefined);
+  }, [id, setDescriptionId]);
+
+  return <p {...props} ref={ref} id={id} />;
+});
+
+export const PopoverClose = React.forwardRef<
+  HTMLButtonElement,
+  React.ButtonHTMLAttributes<HTMLButtonElement>
+>(function PopoverClose(props, ref) {
+  const { setOpen } = usePopoverContext();
+  return (
+    <button
+      type="button"
+      ref={ref}
+      {...props}
+      onClick={(event) => {
+        props.onClick?.(event);
+        setOpen(false);
+      }}
+    />
   );
 });

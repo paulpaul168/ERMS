@@ -44,6 +44,12 @@ body {
 }
 .cell.active{
   background-color: red;
+  animation: blinker 1s linear infinite;
+}
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
 }
 .cell:hover{
   background-color: yellow;

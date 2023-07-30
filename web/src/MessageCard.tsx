@@ -1,6 +1,6 @@
 import Message from "./Message";
 
-function formatHourAndMinute(datetime: Date): string {
+export function formatHourAndMinute(datetime: Date): string {
   const hour = datetime.getHours().toString().padStart(2, "0");
   const minute = datetime.getMinutes().toString().padStart(2, "0");
   return `${hour}:${minute}`;
@@ -28,9 +28,13 @@ const MessageCard: React.FC<{
         <span className="font-bold text-xl">{message.message}</span>
         <span>{formatHourAndMinute(new Date(message.date))}</span>
       </div>
+      <div>
+        <span> {message.from}</span>
+      </div>
       <div>Location: {message.location}</div>
       <div className="w-full flex justify-center">
         <button
+          type="button"
           onClick={async (e) => {
             await changeChecked(e as unknown as Event);
           }}

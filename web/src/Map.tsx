@@ -1,9 +1,12 @@
-import { useEffect, useMemo, useRef } from "react"
-import { Tooltip, TooltipContent, TooltipTrigger } from "./Tooltip";
+import { useMemo } from "react"
+import { Popover, PopoverContent, PopoverTrigger, Tooltip, TooltipContent, TooltipTrigger } from "./Tooltip";
+import Message from "./Message";
+import MessageCard, { formatHourAndMinute } from "./MessageCard";
 
 type MapProps = {
   eventLocations: number[]
   update: number
+  messages: Message[]
 }
 export const MapFC: React.FC<MapProps> = (props) => {
   const divs = useMemo(() => {
@@ -26,7 +29,7 @@ export const MapFC: React.FC<MapProps> = (props) => {
       <div className="mx-auto" style={{ width: 1280 / 1.5, height: 720 / 1.5 }}>
         <div className="cells" style={{ width: 'inherit', height: 'inherit' }}>
           {divs.map((str, idx) => (
-            <Cell key={idx + str} value={str} nmbr={idx} />
+            <Cell key={idx + str} value={str} nmbr={idx} messages={props.messages} />
           ))}
         </div>
 
@@ -39,25 +42,33 @@ export const MapFC: React.FC<MapProps> = (props) => {
 type CellProps = {
   value: string
   nmbr: number
+  messages: Message[]
 }
-const Cell: React.FC<CellProps> = ({ value, nmbr }) => {
+const Cell: React.FC<CellProps> = ({ value, nmbr: location, messages }) => {
   return (
     <>
-      <Tooltip>
-        <TooltipTrigger>
+      <Popover>
+        <PopoverTrigger>
           <div className={`cell ${value === 'x' ? "active" : ""}`} />
-        </TooltipTrigger>
-        <TooltipContent className="Tooltip">
-          <div className="bg-white" >
-{nmbr}
+        </PopoverTrigger>
+        <PopoverContent className="Tooltip">
+          <div className="flex flex-col" >
+            {value === "x" ?
+              messages.filter(m => m.location === location).map(m => (
+                <MessageCard message={m} />
+              ))
+              :
+            <span className="bg-white rounded-xl drop-shadow-md p-3 mb-5">
+              Location: {location}
+            </span>
+            }
           </div>
-        </TooltipContent>
-      </Tooltip>
+        </PopoverContent>
+      </Popover>
 
     </>
   )
-
-
 }
+
 
 

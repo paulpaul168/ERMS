@@ -14,8 +14,7 @@ function App() {
   useInterval(async () => {
     const response = await fetch("https://erms.stefhol.eu/api/v1/events?checked=false", {});
     const messages: Message[] = await response.json();
-
-    if (messages.some((m) => !messageIds.has(m.id))) {
+    if (messages.some((m) => !messageIds.has(m.id)) || messages.length !== messageIds.size) {
       setMessageIds(new Set(messages.map((m) => m.id)));
       setUpdate(prev => prev + 1)
       setEventLocations(messages.map(m => m.location));
@@ -31,7 +30,7 @@ function App() {
         </div>
       </div>
       <article className="mx-auto ">
-        <MapFC eventLocations={eventLocations} update={update} />
+        <MapFC eventLocations={eventLocations} update={update} messages={messages} />
       </article>
       <main className="w-full max-w-lg mx-auto p-4">
         {messages.length > 0 ? (
