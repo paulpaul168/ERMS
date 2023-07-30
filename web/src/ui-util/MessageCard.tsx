@@ -7,19 +7,11 @@ export function formatHourAndMinute(datetime: Date): string {
 }
 const MessageCard: React.FC<{
   message: Message;
-}> = ({ message }) => {
+  dispatchCallback: (id: string) => void;
+}> = ({ message, dispatchCallback }) => {
   async function changeChecked(e: Event) {
     e.preventDefault();
-    const res = await fetch("https://erms.stefhol.eu/api/v1/events", {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: message.id,
-        checked: true,
-      }),
-    });
+    dispatchCallback(message.id);
   }
 
   return (

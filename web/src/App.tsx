@@ -5,22 +5,68 @@ import Message from "./Message";
 import { MapFC } from "./components/Map";
 import MessageCard from "./ui-util/MessageCard";
 
+function arraysHaveSameElements(array1, array2) {
+  // Check if both arrays have the same length
+  if (array1.length !== array2.length) {
+    return false;
+  }
+
+  // Sort the arrays to ignore the order
+  const sortedArray1 = array1.slice().sort();
+  const sortedArray2 = array2.slice().sort();
+
+  // Compare the sorted arrays element by element
+  for (let i = 0; i < sortedArray1.length; i++) {
+    if (sortedArray1[i] !== sortedArray2[i]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 function App() {
   const [messages, setMessages] = useState([] as Message[]);
-  const [messageIds, setMessageIds] = useState(new Set() as Set<string>);
-  const [update, setUpdate] = useState(0)
-  const [eventLocations, setEventLocations] = useState<number[]>([])
+  //const [messageIds, setMessageIds] = useState(new Set() as Set<string>);
+  const [update, setUpdate] = useState(0);
+  const [eventLocations, setEventLocations] = useState<number[]>([]);
 
   useInterval(async () => {
-    const response = await fetch("https://erms.stefhol.eu/api/v1/events?checked=false", {});
-    const messages: Message[] = await response.json();
-    if (messages.some((m) => !messageIds.has(m.id)) || messages.length !== messageIds.size) {
-      setMessageIds(new Set(messages.map((m) => m.id)));
-      setUpdate(prev => prev + 1)
-      setEventLocations(messages.map(m => m.location));
-      setMessages(messages);
+    const response = await fetch(
+      "https://erms.stefhol.eu/api/v1/events?checked=false",
+      {}
+    );
+    const newMessages: Message[] = await response.json();
+    // This is ugly AF, but it works now and I cannot get it to work otherwise
+    if (
+      !arraysHaveSameElements(
+        newMessages.map((m) => m.id),
+        messages.map((m) => m.id)
+      ) ||
+      true
+    ) {
+      setUpdate((prev) => prev + 1);
+      setEventLocations(messages.map((m) => m.location));
+      setMessages(newMessages);
     }
   }, 1000);
+
+  async function dispatchCallback(id: string) {
+    const res = await fetch("https://erms.stefhol.eu/api/v1/events", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: id,
+        checked: true,
+      }),
+    });
+    const newMessages = messages.filter((m) => m.id != id);
+    setMessages(newMessages);
+    setUpdate((prev) => prev + 1);
+    setEventLocations(newMessages.map((m) => m.location));
+  }
 
   return (
     <>
@@ -30,11 +76,21 @@ function App() {
         </div>
       </div>
       <article className="mx-auto ">
-        <MapFC eventLocations={eventLocations} update={update} messages={messages} />
+        <MapFC
+          eventLocations={eventLocations}
+          update={update}
+          messages={messages}
+        />
       </article>
       <main className="w-full max-w-lg mx-auto p-4">
         {messages.length > 0 ? (
-          messages.map((m) => <MessageCard key={m.id} message={m} />)
+          messages.map((m) => (
+            <MessageCard
+              key={m.id}
+              message={m}
+              dispatchCallback={dispatchCallback}
+            />
+          ))
         ) : (
           <div className="italic w-full flex justify-center pt-24">
             No open messages 🎉{" "}
