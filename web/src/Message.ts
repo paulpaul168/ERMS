@@ -1,6 +1,6 @@
 type Message = {
   message: string;
-  location: string;
+  location: number;
   date: string;
   checked: boolean;
   id: string;

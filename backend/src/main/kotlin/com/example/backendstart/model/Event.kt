@@ -17,7 +17,7 @@ class Event(
     val message: String,
     val date: Instant,
     var checked: Boolean,
-    @OneToOne
+    @ManyToOne
     val from: Person?
 ) {
     @Id

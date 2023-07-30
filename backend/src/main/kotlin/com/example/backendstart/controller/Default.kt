@@ -58,19 +58,38 @@ class Default(
         }
     }
 
+    data class EventResponse(
+        val id: UUID,
+        val deviceId: String,
+        val location: Int,
+        val message: String,
+        val date: Instant,
+        var checked: Boolean,
+        val from: String
+    )
+
     @GetMapping("/events")
-    fun allEvents(@RequestParam(required = false, name = "checked") checked: String?): Collection<Event> {
+    fun allEvents(@RequestParam checked: String?): Collection<EventResponse> {
 
         val events = eventService.list()
 
-        events.filter {
+        return events.filter {
             if (checked != null) {
                 it.checked == (checked == "true")
             } else {
                 true
             }
-        }.sortedBy { it.date }
-        return events.take(20)
+        }.sortedBy { it.date }.map {
+            EventResponse(
+                id = it.id,
+                deviceId = it.deviceId,
+                location = Random.nextInt(880),
+                message = it.message,
+                date = it.date,
+                checked = it.checked,
+                from = it.from?.name ?: ""
+            )
+        }
     }
 
 }
