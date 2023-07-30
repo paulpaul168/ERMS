@@ -1,9 +1,9 @@
 import { useState } from "react";
 import "./App.css";
-import MessageCard from "./MessageCard";
 import { useInterval } from "./util";
 import Message from "./Message";
-import { MapFC } from "./Map";
+import { MapFC } from "./components/Map";
+import MessageCard from "./ui-util/MessageCard";
 
 function App() {
   const [messages, setMessages] = useState([] as Message[]);

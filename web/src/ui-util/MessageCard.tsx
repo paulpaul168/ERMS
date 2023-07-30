@@ -1,4 +1,4 @@
-import Message from "./Message";
+import Message from "../Message";
 
 export function formatHourAndMinute(datetime: Date): string {
   const hour = datetime.getHours().toString().padStart(2, "0");

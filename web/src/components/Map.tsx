@@ -1,7 +1,7 @@
 import { useMemo } from "react"
-import { Popover, PopoverContent, PopoverTrigger, Tooltip, TooltipContent, TooltipTrigger } from "./Tooltip";
-import Message from "./Message";
-import MessageCard, { formatHourAndMinute } from "./MessageCard";
+import Message from "../Message";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui-util/Popover";
+import MessageCard from "../ui-util/MessageCard";
 
 type MapProps = {
   eventLocations: number[]
@@ -58,9 +58,9 @@ const Cell: React.FC<CellProps> = ({ value, nmbr: location, messages }) => {
                 <MessageCard message={m} />
               ))
               :
-            <span className="bg-white rounded-xl drop-shadow-md p-3 mb-5">
-              Location: {location}
-            </span>
+              <span className="bg-white rounded-xl drop-shadow-md p-3 mb-5">
+                Location: {location}
+              </span>
             }
           </div>
         </PopoverContent>
