@@ -41,6 +41,7 @@ import androidx.core.content.ContextCompat
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonColors
 import kotlinx.coroutines.delay
+import java.lang.Math.abs
 
 
 class MainActivity : ComponentActivity() {
@@ -95,12 +96,23 @@ fun WearApp() {
                 SwipeGestureDetection(
                     onSwipeRight = {},
                     onSwipeUp = {
-                        println("up")
                         selected = (selected - 1).coerceAtLeast(-1);
                     },
                     onSwipeDown = {
-                        println("down")
                         selected = (selected + 1).coerceAtMost(actions.count() - 1);
+                    },
+                    onTap = {
+                        val messageData = MessageData(
+                            "1234343",
+                            actions[selected].name,
+                            listOf<BeaconData>(
+                                BeaconData("1", 0.3),
+                                BeaconData("2", 0.2),
+                                BeaconData("3", 1.2)
+                            )
+                        )
+                        //bleScanner.scanLeDevice();
+                        HttpPostTask("https://erms.stefhol.eu/api/v1/events", messageData).execute()
                     }
                 )
 
@@ -124,25 +136,12 @@ fun WearApp() {
                     // FIXME: on tap (or maybe double tap to avoid random touches) we should
                     // send the Post request that is already in the git history.
                     Column {
-                        Button(
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(Color.Black)
                                 .fillMaxHeight(0.65F),
-                           // contentAlignment = Alignment.Center,
-                            onClick = {
-                                val messageData = MessageData(
-                                    "1234343",
-                                    actions[selected].name,
-                                    listOf<BeaconData>(
-                                        BeaconData("1", 0.3),
-                                        BeaconData("2", 0.2),
-                                        BeaconData("3", 1.2)
-                                    )
-                                )
-                                //bleScanner.scanLeDevice();
-                                HttpPostTask("https://erms.stefhol.eu/api/v1/events", messageData).execute()
-                            }
+                           contentAlignment = Alignment.Center,
                         ) {
                             Text(
                                 text = actions[selected].emoji,
@@ -180,7 +179,8 @@ fun WearApp() {
 fun SwipeGestureDetection(
     onSwipeRight: () -> Unit,
     onSwipeUp: () -> Unit,
-    onSwipeDown: () -> Unit
+    onSwipeDown: () -> Unit,
+    onTap: () -> Unit
 ) {
     var startX by remember { mutableStateOf(0f) }
     var startY by remember { mutableStateOf(0f) }
@@ -203,6 +203,7 @@ fun SwipeGestureDetection(
                             deltaY < -50 -> onSwipeDown()
                             deltaY > 50 -> onSwipeUp()
                             deltaX < -50 -> onSwipeRight()
+                            abs(deltaX) < 50 && kotlin.math.abs(deltaY) < 50 -> onTap()
                         }
                         true
                     }
@@ -211,7 +212,6 @@ fun SwipeGestureDetection(
                 }
             }
     ) {
-        // Buttons and other UI elements can be placed here as before
     }
 }
 
