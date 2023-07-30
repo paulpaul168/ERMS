@@ -24,16 +24,14 @@ export const MapFC: React.FC<MapProps> = (props) => {
       style={{ position: "relative" }}
     >
 
-
-
-      <div className="mx-auto" style={{ width: 1280 / 1.5, height: 720 / 1.5 }}>
+      <div className="drop-shadow-md" style={{ width: 1280 / 1.5, height: 720 / 1.5 }}>
         <div className="cells" style={{ width: 'inherit', height: 'inherit' }}>
           {divs.map((str, idx) => (
-            <Cell key={idx + str} value={str} nmbr={idx} messages={props.messages} />
+            <Cell key={idx + str} value={str} nmbr={idx} messages={props.messages}/>
           ))}
         </div>
 
-        <canvas id="map-canvas" style={{ width: 1280 / 1.5, height: 720 / 1.5 }} />
+        <canvas id="map-canvas" className="rounded-xl " style={{ width: 1280 / 1.5, height: 720 / 1.5 }} />
       </div>
     </div>
   </>

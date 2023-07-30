@@ -70,33 +70,22 @@ function App() {
 
   return (
     <>
-      <div className="w-full p-4">
-        <div className="max-w-lg mx-auto">
-          <h1 className="text-3xl font-bold">Messages</h1>
-        </div>
+      <div class="grid grid-cols-3 gap-4 m-4 mx-28">
+        <h1 className="text-3xl font-bold col-span-3">Emergencies</h1>
+        <article className="col-span-2">
+          <MapFC eventLocations={eventLocations} update={update} messages={messages} />
+        </article>
+        <main className="col-span-1">
+        
+          {messages.length > 0 ? (
+            messages.map((m) => <MessageCard key={m.id} message={m} dispatchCallback={dispatchCallback}/>)
+          ) : (
+            <div className="italic w-full flex justify-center pt-24">
+              No open messages 🎉{" "}
+            </div>
+          )}
+        </main>
       </div>
-      <article className="mx-auto ">
-        <MapFC
-          eventLocations={eventLocations}
-          update={update}
-          messages={messages}
-        />
-      </article>
-      <main className="w-full max-w-lg mx-auto p-4">
-        {messages.length > 0 ? (
-          messages.map((m) => (
-            <MessageCard
-              key={m.id}
-              message={m}
-              dispatchCallback={dispatchCallback}
-            />
-          ))
-        ) : (
-          <div className="italic w-full flex justify-center pt-24">
-            No open messages 🎉{" "}
-          </div>
-        )}
-      </main>
     </>
   );
 }
