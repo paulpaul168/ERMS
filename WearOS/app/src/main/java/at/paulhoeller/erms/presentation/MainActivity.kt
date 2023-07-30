@@ -36,13 +36,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.toArgb
-import androidx.core.content.ContextCompat
-import androidx.wear.compose.material.Button
-import androidx.wear.compose.material.ButtonColors
 import kotlinx.coroutines.delay
 import java.lang.Math.abs
-import kotlin.random.Random
 
 
 class MainActivity : ComponentActivity() {
@@ -133,9 +128,6 @@ fun WearApp() {
                         )
                     }
                 } else {
-
-                    // FIXME: on tap (or maybe double tap to avoid random touches) we should
-                    // send the Post request that is already in the git history.
                     Column {
                         Box(
                             modifier = Modifier
