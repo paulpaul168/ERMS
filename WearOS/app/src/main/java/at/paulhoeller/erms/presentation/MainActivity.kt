@@ -42,6 +42,7 @@ import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonColors
 import kotlinx.coroutines.delay
 import java.lang.Math.abs
+import kotlin.random.Random
 
 
 class MainActivity : ComponentActivity() {
@@ -106,9 +107,9 @@ fun WearApp() {
                             "1234343",
                             actions[selected].name,
                             listOf<BeaconData>(
-                                BeaconData("1", 0.3),
-                                BeaconData("2", 0.2),
-                                BeaconData("3", 1.2)
+                                BeaconData("1", LocationHelper.getLocation()),
+                                BeaconData("2", LocationHelper.getLocation()),
+                                BeaconData("3", LocationHelper.getLocation())
                             )
                         )
                         //bleScanner.scanLeDevice();
