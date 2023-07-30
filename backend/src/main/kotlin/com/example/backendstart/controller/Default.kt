@@ -83,7 +83,7 @@ class Default(
             EventResponse(
                 id = it.id,
                 deviceId = it.deviceId,
-                location = Random.nextInt(880),
+                location = getLocationNumber(Location(it.x, it.y, it.z)),
                 message = it.message,
                 date = it.date,
                 checked = it.checked,
@@ -107,5 +107,18 @@ data class CreateEvent(
 
 class Location(val x: Double, val y: Double, val z: Double);
 
+/**
+ * Calcs a scuffed seed out of location then gets the predicable first Int
+ * TODO: Calc Location for real
+ */
+fun getLocationNumber(location: Location): Int {
+    return try {
+        val seed = location.x * 1000 + location.y * 1000 + location.z * 1000
+        java.util.Random(seed.toLong()).nextInt(880)
+    } catch (ex: Exception) {
+        Random(0).nextInt(880)
+    }
+
+}
 
 

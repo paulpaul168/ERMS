@@ -5,6 +5,7 @@ import com.example.backendstart.controller.Location
 import com.example.backendstart.model.Beacon
 import org.slf4j.LoggerFactory
 import kotlin.math.pow
+import kotlin.random.Random
 
 
 class LocationCalc {
@@ -73,7 +74,8 @@ class LocationCalc {
             logger?.trace("Value of x is : {}", x)
             logger?.trace("Value of y is : {}", y)
             logger?.trace("Value of z is : {}", z)
-            return Location(x, y, z)
+            //TODO: This calculation is random 10000000 should be not needed but the location is very small somehow
+            return Location(x * 10000000, y * 10000000, z * 10000000)
         } else {
             //print reason why no solution
             if (D1 == 0.0 && D2 == 0.0 && D3 == 0.0) {
@@ -90,7 +92,12 @@ class LocationCalc {
                     acc
                 }
             }
-            return Location(smallestDistance[0], smallestDistance[1], smallestDistance[2])
+            // TODO: This calculation from the internet is providing boring values we need to spice this up
+            return Location(
+                magicRandomFlavour(smallestDistance[0]),
+                magicRandomFlavour(smallestDistance[1]),
+                magicRandomFlavour(smallestDistance[2])
+            )
         }
     }
 
@@ -140,6 +147,11 @@ class LocationCalc {
          */
         private fun calculateDistance(rssi: Double): Double {
             return 10.0.pow((-69.0 - rssi) / 20.0)
+        }
+
+        private fun magicRandomFlavour(inp: Double): Double {
+//            return inp
+            return Random.nextDouble() * inp * 10000000
         }
     }
 
