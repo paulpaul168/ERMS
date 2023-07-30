@@ -10,7 +10,7 @@ val Pink600 = Color(0xFFD81B60)
 val Red400 = Color(0xFFCF6679)
 
 internal val wearColorPalette: Colors = Colors(
-    primary = Teal400,
+    primary = Color.Black,//Teal400,
     primaryVariant = Teal600,
     secondary = Pink400,
     secondaryVariant = Pink600,

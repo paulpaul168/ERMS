@@ -1,9 +1,3 @@
-/* While this template provides a good starting point for using Wear Compose, you can always
- * take a look at https://github.com/android/wear-os-samples/tree/main/ComposeStarter and
- * https://github.com/android/wear-os-samples/tree/main/ComposeAdvanced to find the most up to date
- * changes to the libraries and their usages.
- */
-
 package at.paulhoeller.erms.presentation
 
 import android.os.Build
@@ -25,31 +19,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.wear.compose.material.Text
 import at.paulhoeller.erms.presentation.theme.ERMSTheme
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.unit.TextUnit
-import androidx.wear.compose.material.MaterialTheme
+import androidx.compose.ui.graphics.toArgb
+import androidx.core.content.ContextCompat
+import androidx.wear.compose.material.Button
+import androidx.wear.compose.material.ButtonColors
 import kotlinx.coroutines.delay
 
 
@@ -134,12 +124,25 @@ fun WearApp() {
                     // FIXME: on tap (or maybe double tap to avoid random touches) we should
                     // send the Post request that is already in the git history.
                     Column {
-                        Box(
+                        Button(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(Color.Black)
                                 .fillMaxHeight(0.65F),
-                            contentAlignment = Alignment.Center
+                           // contentAlignment = Alignment.Center,
+                            onClick = {
+                                val messageData = MessageData(
+                                    "1234343",
+                                    actions[selected].name,
+                                    listOf<BeaconData>(
+                                        BeaconData("1", 0.3),
+                                        BeaconData("2", 0.2),
+                                        BeaconData("3", 1.2)
+                                    )
+                                )
+                                //bleScanner.scanLeDevice();
+                                HttpPostTask("https://erms.stefhol.eu/api/v1/events", messageData).execute()
+                            }
                         ) {
                             Text(
                                 text = actions[selected].emoji,
